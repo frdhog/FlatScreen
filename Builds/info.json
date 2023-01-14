@@ -1,0 +1,19 @@
+{
+  "name": "FlatScreen",
+  "description": "Your Projects Description",
+  "dll_file": "FlatScreen.dll",
+  "last_edit": 638093119969699954,
+  "pub_id": "",
+  "json_version": "",
+  "version": "1.0.0",
+  "tagline": "",
+  "repository": "",
+  "is_public": false,
+  "unlisted": false,
+  "preview_image": "",
+  "web_preview_image": "",
+  "dependencies": ["TrackIRUnity.dll", "TriquetraInteractions.dll"],
+  "mod_dependencies": null,
+  "ContentType": 3,
+  "menu_mod": true
+}
