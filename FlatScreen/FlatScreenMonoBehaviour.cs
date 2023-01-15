@@ -21,7 +21,7 @@ namespace Triquetra.FlatScreen
         // TODO?: Bobblehead gets a VRInteractable
         // TODO?: Back button (ESC)
 
-        private Rect windowRect = new Rect(1350, 20, 400, 700);
+        private Rect windowRect = new Rect(25, 25, 350, 500);
         private bool showWindow = true;
         private bool flatScreenEnabled = true;
         public TrackIRTransformer TrackIRTransformer { get; private set; }
@@ -108,105 +108,109 @@ namespace Triquetra.FlatScreen
 
             GUI.enabled = Enabled;
 
-            GUILayout.BeginHorizontal();
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             {
-                float FOV = GetCameraFOV();
-                float newFOV = FOV;
-                GUILayout.Label($"FOV: {FOV}");
-                newFOV = Mathf.Round(GUILayout.HorizontalSlider(FOV, 30f, 120f));
-                if (newFOV != FOV)
-                    SetCameraFOV(newFOV);
-            }
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                {
+                    float FOV = GetCameraFOV();
+                    float newFOV = FOV;
+                    GUILayout.Label($"FOV: {FOV}");
+                    newFOV = Mathf.Round(GUILayout.HorizontalSlider(FOV, 30f, 120f));
+                    if (newFOV != FOV)
+                        SetCameraFOV(newFOV);
+                }
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"Mouse Sensitivity: {Sensitivity}");
-            Sensitivity = Mathf.Round(GUILayout.HorizontalSlider(Sensitivity, 1f, 9f));
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"Mouse Sensitivity: {Sensitivity}");
+                Sensitivity = Mathf.Round(GUILayout.HorizontalSlider(Sensitivity, 1f, 9f));
+                GUILayout.EndHorizontal();
 
-            LimitXRotation = GUILayout.Toggle(LimitXRotation, " Limit X Rotation");
-            LimitYRotation = GUILayout.Toggle(LimitYRotation, " Limit Y Rotation");
+                LimitXRotation = GUILayout.Toggle(LimitXRotation, " Limit X Rotation");
+                LimitYRotation = GUILayout.Toggle(LimitYRotation, " Limit Y Rotation");
 
-            if (GUILayout.Button("Reset Camera Rotation"))
-                ResetCameraRotation();
+                if (GUILayout.Button("Reset Camera Rotation"))
+                    ResetCameraRotation();
 
-            GUILayout.Space(30);
+                GUILayout.Space(30);
 
-            GUILayout.BeginHorizontal();
-            {
-                GUILayout.Label($"Hovered VRInteractable:");
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label($"Hovered VRInteractable:");
+                    if (targetedVRInteractable != null)
+                        GUILayout.Label(targetedVRInteractable?.interactableName ?? "???");
+                    else
+                        GUILayout.Label("[None]");
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.Label("Press Middle mouse to click and scroll wheel for non-integer knobs");
+
+                GUILayout.Space(20);
+
+                if (GUILayout.Button("Fix Camera"))
+                {
+                    Reclean();
+                }
+
+                if (GUILayout.Button(thirdPerson ? "First Person" : "Third Person"))
+                {
+                    thirdPerson = !thirdPerson;
+                    foreach (Camera specCam in GetSpectatorCameras())
+                    {
+                        specCam.depth = thirdPerson ? -6 : 50;
+                    }
+                }
+
+                GUI.enabled = true;
+
+                /*if (IsReadyRoomScene())
+                {
+                    if (GUILayout.Button("Quick Select Vehicle"))
+                    {
+                        PilotSelectUI pilotSelectUI = FindObjectOfType<PilotSelectUI>();
+                        pilotSelectUI.StartSelectedPilotButton();
+                        pilotSelectUI.SelectVehicleButton();
+                    }
+                }*/
+
+                GUILayout.Space(30);
+
+                if (GUILayout.Button("Start Tracking"))
+                {
+                    if (TrackIRTransformer == null)
+                        TrackIRTransformer = GetComponent<TrackIRTransformer>() ?? gameObject.AddComponent<TrackIRTransformer>();
+                    TrackIRTransformer.StartTracking();
+                }
+                if (GUILayout.Button("Stop Tracking"))
+                {
+                    if (TrackIRTransformer == null)
+                        TrackIRTransformer = GetComponent<TrackIRTransformer>() ?? gameObject.AddComponent<TrackIRTransformer>();
+                    TrackIRTransformer.StopTracking();
+                }
+
+                GUILayout.Space(30);
+                /*
+                Camera camera = GetEyeCamera();
+                if (camera != null)
+                {
+                    GUILayout.Label($"Camera: {camera.name}");
+                    GUILayout.Label($"Camera GameObject: {GetEyeCameraGameObject()?.name}");
+                    GUILayout.Label($"Depth: {camera.depth}");
+                    GUILayout.Label($"Enabled: {camera.enabled}");
+                    GUILayout.Label($"Is Active and Enabled: {camera.isActiveAndEnabled}");
+                    GUILayout.Label($"Quad Parent: {camera.transform.parent?.parent?.parent?.parent?.name}");
+                }
+
+                GUILayout.Space(30);
+
                 if (targetedVRInteractable != null)
-                    GUILayout.Label(targetedVRInteractable?.interactableName ?? "???");
-                else
-                    GUILayout.Label("[None]");
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.Label("Press Middle mouse to click and scroll wheel for non-integer knobs");
-
-            GUILayout.Space(20);
-
-            if (GUILayout.Button("Fix Camera"))
-            {
-                Reclean();
-            }
-
-            if (GUILayout.Button(thirdPerson ? "First Person" : "Third Person"))
-            {
-                thirdPerson = !thirdPerson;
-                foreach (Camera specCam in GetSpectatorCameras())
                 {
-                    specCam.depth = thirdPerson ? -6 : 50;
-                }
+                    VRThrottle throttle = targetedVRInteractable.GetComponent<VRThrottle>();
+                    GUILayout.Label($"Throttle: {throttle}");
+                    GUILayout.Label($"Throttle Transform: {throttle?.throttleTransform?.name}");
+                }*/
             }
-
-            GUI.enabled = true;
-
-            /*if (IsReadyRoomScene())
-            {
-                if (GUILayout.Button("Quick Select Vehicle"))
-                {
-                    PilotSelectUI pilotSelectUI = FindObjectOfType<PilotSelectUI>();
-                    pilotSelectUI.StartSelectedPilotButton();
-                    pilotSelectUI.SelectVehicleButton();
-                }
-            }*/
-
-            GUILayout.Space(30);
-
-            if (GUILayout.Button("Start Tracking"))
-            {
-                if (TrackIRTransformer == null)
-                    TrackIRTransformer = GetComponent<TrackIRTransformer>() ?? gameObject.AddComponent<TrackIRTransformer>();
-                TrackIRTransformer.StartTracking();
-            }
-            if (GUILayout.Button("Stop Tracking"))
-            {
-                if (TrackIRTransformer == null)
-                    TrackIRTransformer = GetComponent<TrackIRTransformer>() ?? gameObject.AddComponent<TrackIRTransformer>();
-                TrackIRTransformer.StopTracking();
-            }
-
-            GUILayout.Space(30);
-            /*
-            Camera camera = GetEyeCamera();
-            if (camera != null)
-            {
-                GUILayout.Label($"Camera: {camera.name}");
-                GUILayout.Label($"Camera GameObject: {GetEyeCameraGameObject()?.name}");
-                GUILayout.Label($"Depth: {camera.depth}");
-                GUILayout.Label($"Enabled: {camera.enabled}");
-                GUILayout.Label($"Is Active and Enabled: {camera.isActiveAndEnabled}");
-                GUILayout.Label($"Quad Parent: {camera.transform.parent?.parent?.parent?.parent?.name}");
-            }
-
-            GUILayout.Space(30);
-
-            if (targetedVRInteractable != null)
-            {
-                VRThrottle throttle = targetedVRInteractable.GetComponent<VRThrottle>();
-                GUILayout.Label($"Throttle: {throttle}");
-                GUILayout.Label($"Throttle Transform: {throttle?.throttleTransform?.name}");
-            }*/
+            GUILayout.EndScrollView();
         }
 
         public static bool IsFlyingScene()
@@ -632,6 +636,8 @@ namespace Triquetra.FlatScreen
         }
 
         bool hasCleanedGloves = false;
+        private Vector2 scrollPosition;
+
         public void CleanGloves()
         {
             if (hasCleanedGloves)
