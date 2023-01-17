@@ -9,6 +9,9 @@ Dependencies/*
 !Dependencies/instructions.txt
 !Dependencies/TrackIRUnity.dll
 
+Builds/*
+!Builds/info.json
+
 # User-specific files
 *.rsuser
 *.suo

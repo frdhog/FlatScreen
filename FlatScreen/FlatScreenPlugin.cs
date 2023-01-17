@@ -16,8 +16,7 @@ namespace Triquetra.FlatScreen
         // This method is run once, when the Mod Loader is done initialising this game object
         public override void ModLoaded()
         {
-            if (!XRSettings.enabled || XRSettings.loadedDeviceName == "")
-                EnableFlatScreen();
+            EnableFlatScreen();
             base.ModLoaded();
         }
 
