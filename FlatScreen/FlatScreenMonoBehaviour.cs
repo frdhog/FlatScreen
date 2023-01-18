@@ -51,7 +51,8 @@ namespace Triquetra.FlatScreen
                     else // just disabled
                     {
                         ResetCameraRotation();
-                        HideGloves(true);
+                        UnHideGloves();
+                        UnCleanCameras();
                     }
 
                     flatScreenEnabled = value;
@@ -257,6 +258,18 @@ namespace Triquetra.FlatScreen
             helmetCam?.SetActive(false);
             eyeCamera.fieldOfView = DefaultCameraFOV;
             hasCleanedCameras = true;
+        }
+
+        public void UnCleanCameras()
+        {
+            hasCleanedCameras = false;
+            Camera eyeCamera = GetEyeCamera();
+            GameObject helmetCam = eyeCamera?.transform?.Find("Camera (eye) Helmet")?.gameObject;
+
+            if (eyeCamera == null || helmetCam == null)
+                return;
+
+            helmetCam?.SetActive(true);
         }
 
         public void Update()
@@ -662,6 +675,12 @@ namespace Triquetra.FlatScreen
             rightController.gameObject.SetActive(active);
 
             hasHiddenGloves = true;
+        }
+
+        public void UnHideGloves()
+        {
+            hasHiddenGloves = false;
+            HideGloves(true);
         }
 
         public void CheckEndMission()
