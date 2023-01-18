@@ -23,7 +23,7 @@ namespace Triquetra.FlatScreen
 
         private Rect windowRect = new Rect(25, 25, 350, 500);
         private bool showWindow = true;
-        private bool flatScreenEnabled = true;
+        private bool flatScreenEnabled = false;
         public TrackIRTransformer TrackIRTransformer { get; private set; }
 
         public VRInteractable targetedVRInteractable;
@@ -49,7 +49,10 @@ namespace Triquetra.FlatScreen
                     if (value) // just re-enabled
                         CheckEndMission();
                     else // just disabled
+                    {
                         ResetCameraRotation();
+                        HideGloves(true);
+                    }
 
                     flatScreenEnabled = value;
                 }
@@ -226,7 +229,6 @@ namespace Triquetra.FlatScreen
 
         public void SetTrackingObject(GameObject trackingObject)
         {
-
             if (TrackIRTransformer == null)
                 TrackIRTransformer = GetComponent<TrackIRTransformer>() ?? gameObject.AddComponent<TrackIRTransformer>();
 
@@ -261,6 +263,9 @@ namespace Triquetra.FlatScreen
         {
             if (Input.GetKeyDown(KeyCode.F9))
                 showWindow = !showWindow;
+
+            if (!Enabled)
+                return;
 
             if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Z))
                 ResetCameraRotation();
@@ -436,7 +441,7 @@ namespace Triquetra.FlatScreen
                 if (IsFlyingScene())
                     CleanCameras();
 
-                CleanGloves();
+                HideGloves();
                 CheckEndMission();
 
                 SetTrackingObject(cameraEyeGameObject);
@@ -543,7 +548,7 @@ namespace Triquetra.FlatScreen
         public void Reclean()
         {
             hasCleanedCameras = false;
-            hasCleanedGloves = false;
+            hasHiddenGloves = false;
             showEndScreenWindow = false;
             cameraEyeGameObject = null;
             thirdPerson = false;
@@ -635,12 +640,12 @@ namespace Triquetra.FlatScreen
             return GameObject.FindObjectsOfType<Camera>(false).Where(c => c.name == "Camera (eye)" && c.isActiveAndEnabled);
         }
 
-        bool hasCleanedGloves = false;
+        bool hasHiddenGloves = false;
         private Vector2 scrollPosition;
 
-        public void CleanGloves()
+        public void HideGloves(bool active = false)
         {
-            if (hasCleanedGloves)
+            if (hasHiddenGloves)
                 return;
             Camera eyeCamera = GetEyeCamera();
 
@@ -653,14 +658,16 @@ namespace Triquetra.FlatScreen
 
             // leftController.transform.position = eyeCamera.transform.position + (eyeCamera.transform.forward * 1.5f);
             // rightController.transform.position = eyeCamera.transform.position + (eyeCamera.transform.forward * 1.5f);
-            leftController.gameObject.SetActive(false);
-            rightController.gameObject.SetActive(false);
+            leftController.gameObject.SetActive(active);
+            rightController.gameObject.SetActive(active);
 
-            hasCleanedGloves = true;
+            hasHiddenGloves = true;
         }
 
         public void CheckEndMission()
         {
+            if (showEndScreenWindow)
+                return;
             EndMission endMission = GameObject.FindObjectOfType<EndMission>(false);
             if (endMission == null || endMission.enabled == false)
                 return;
