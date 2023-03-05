@@ -14,7 +14,9 @@ namespace Triquetra.FlatScreen
 {
     public class FlatScreenMonoBehaviour : MonoBehaviour
     {
+        // https://vtolvr-mods.com/viewbugs/zj7ylyrf/
         // TODO: Fix hand positions
+        // TODO: Scrollable scrollbars
         // TODO?: Hide mouse on right click
         // TODO?: WASDEQ controls
         // TODO?: Better ImGui for restarting/ending mission
